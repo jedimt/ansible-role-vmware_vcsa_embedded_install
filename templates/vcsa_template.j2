@@ -1,0 +1,58 @@
+#!/bin/sh
+OVFTOOL_BIN_PATH="{{ ovf_bin_path }}"
+VCSA_OVA="{{ vcsa_ovf_7 }}"
+#ESXi
+DEPLOYMENT_TARGET_ADDRESS="{{ groups.servers[0] }}"
+DEPLOYMENT_TARGET_USERNAME="{{ deployment_target_username }}"
+DEPLOYMENT_TARGET_PASSWORD="{{ deployment_target_password }}"
+
+VCSA_NAME="{{ vcsa_name }}"
+VCSA_SIZE="{{ vcsa_size }}"
+vcenter_ip="{{ vcenter_ip }}"
+VCSA_HOSTNAME="{{ vcsa_hostname }}"
+VCSA_GW="{{ vcsa_gw }}"
+VCSA_CIDR="{{ vcsa_cidr }}"
+VCSA_DNS="{{ vcsa_dns }}"
+VCSA_NTP="{{ vcsa_ntp }}"
+VCSA_SSO_DOMAIN="{{ vcsa_sso_domain }}"
+VCSA_SSO_PASSWORD="{{ vcsa_sso_password }}"
+VCSA_PASSWORD="{{ vcsa_password }}"
+VCSA_NETWORK="{{ vcsa_network }}"
+VCSA_DATASTORE="{{ vcsa_datastore }}"
+VCSA_STAGE1ANDSTAGE2="{{ vcsa_stage1andstage2 }}"
+
+### DO NOT EDIT BEYOND HERE ###
+
+"${OVFTOOL_BIN_PATH}" \
+        --powerOn \
+        --skipManifestCheck \
+        --X:injectOvfEnv \
+        --acceptAllEulas \
+        --noSSLVerify \
+        --sourceType=OVF \
+        --allowExtraConfig \
+        --diskMode=thin \
+        --name="${VCSA_NAME}" \
+        --net:"Network 1"="${VCSA_NETWORK}" \
+        --datastore="${VCSA_DATASTORE}" \
+        --deploymentOption=${VCSA_SIZE} \
+        --prop:guestinfo.cis.deployment.node.type=embedded \
+        --prop:guestinfo.cis.appliance.net.addr=${vcenter_ip} \
+        --prop:guestinfo.cis.appliance.net.pnid=${VCSA_HOSTNAME} \
+        --prop:guestinfo.cis.appliance.net.mode=static \
+        --prop:guestinfo.cis.appliance.net.addr.family=ipv4 \
+        --prop:guestinfo.cis.appliance.net.prefix=${VCSA_CIDR} \
+        --prop:guestinfo.cis.appliance.net.gateway=${VCSA_GW} \
+        --prop:guestinfo.cis.appliance.ntp.servers=${VCSA_NTP} \
+        --prop:guestinfo.cis.appliance.net.dns.servers=${VCSA_DNS} \
+        --prop:guestinfo.cis.vmdir.domain-name=${VCSA_SSO_DOMAIN} \
+        --prop:guestinfo.cis.vmdir.password=${VCSA_SSO_PASSWORD} \
+        --prop:guestinfo.cis.appliance.root.passwd=${VCSA_PASSWORD} \
+        --prop:guestinfo.cis.system.vm0.port=443 \
+        --prop:guestinfo.cis.appliance.ssh.enabled=True \
+        --prop:guestinfo.cis.appliance.root.shell=/bin/bash \
+        --prop:guestinfo.cis.ceip_enabled=False \
+        --prop:guestinfo.cis.vmdir.first-instance=True \
+        --prop:guestinfo.cis.deployment.autoconfig=${VCSA_STAGE1ANDSTAGE2} \
+        "${VCSA_OVA}" \
+        "vi://${DEPLOYMENT_TARGET_USERNAME}:${DEPLOYMENT_TARGET_PASSWORD}@${DEPLOYMENT_TARGET_ADDRESS}/"

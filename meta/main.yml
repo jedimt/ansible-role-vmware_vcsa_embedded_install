@@ -1,0 +1,20 @@
+galaxy_info:
+  author: jedimt
+  role_name: vmware_vcsa_embedded_install
+  description: Install VCSA to a selected ESXi host
+
+  license: MIT
+
+  min_ansible_version: "5"
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - xenial
+        - jammy
+
+  galaxy_tags:
+    - vCenter
+
+dependencies: []
