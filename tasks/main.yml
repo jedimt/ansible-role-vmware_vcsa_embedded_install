@@ -81,9 +81,9 @@
     - run_script
     - vm_check
 
-- name: Test connectivity to new VCSA {{ vcsa_hostname }}
+- name: Test connectivity to new VCSA {{ vcsa_name }}
   community.vmware.vmware_about_info:
-    hostname: '{{ vcsa_hostname }}'
+    hostname: '{{ vcsa_name }}'
     username: '{{ vault_vcenter_username }}'
     password: '{{ vault_vcenter_password }}'
     validate_certs: false
