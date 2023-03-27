@@ -1,0 +1,40 @@
+
+# The VCSA version deployed depends on variable vsphere_version (7|8)
+vsphere_version: "7"
+
+# Tell Ansible where to look for the ESXi Python interpreter
+ansible_python_interpreter: /bin/python
+
+# OVFTool path on the Ansible controller.
+ovf_bin_path: "/usr/bin/ovftool/ovftool"
+
+# We have to use HTTPS for ovftool to be happy
+# Path to the VCSA OVF file (and VMDKs)
+vcsa_ovf_7: "https://homes.sc0.nebulon.com/aaron/files/vmware/ovf7/vcsa703.ovf"
+vcsa_ovf_8: "https://homes.sc0.nebulon.com/aaron/files/vmware/ovf_8.0.0.10200/vcsa_8.0.0.10200.ovf"
+
+# Location on the ESXi host to place the VCSA deployment script
+deployment_script_path: "/altbootbank/nebulon/deploy_vcsa.sh"
+
+# VCSA deployment variables for the script template files
+# vcsa_name can be specified here, but I define it in inventory so I don't have to change
+# role values when I change deployment targets.
+# vcsa_name: ""
+# vcsa_size: "small"
+# vcenter_ip: 10.100.24.31
+# vcsa_gw: 10.100.24.1
+# vcsa_cidr: 22
+# vcsa_dns: 10.100.72.10
+# vcsa_ntp: 10.100.72.10
+# vcsa_sso_domain: "vsphere.local"
+# vcsa_sso_password: "{{ vault_vcsa_sso_password }}"
+# vcsa_password: "{{ vault_vcsa_sso_password }}"
+# vcsa_network: "VM Network"
+# Set vcsa_datastore to "placeholder" and then dynamically replace that with
+# a discoverd VMFS-6 datastore using the 'lineinfile' Ansible function
+vcsa_datastore: "placeholder"
+vcsa_stage1andstage2: True
+
+# Credentials to use for the target ESXi host
+deployment_target_username: root
+deployment_target_password: "{{ vault_deployment_target_password }}"
