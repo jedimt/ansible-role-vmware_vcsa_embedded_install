@@ -1,38 +1,102 @@
-Role Name
+Ansible Role: VMware VCSA Embedded Install
 =========
 
-A brief description of the role goes here.
+Installs a VMware VCSA to a ESXi host.
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+None.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+Variables for this role are pulled the defaults/main.yml file.
+
+Additional variables for the VCSA deployment itself can either be put in the defaults/main.yml file or you can put deployment specific variables in
+your host inventory like so:
+
+    # VMware Bare metal
+    vmware:
+      hosts:
+        server-09.tme.nebulon.com:
+        server-10.tme.nebulon.com:
+        server-11.tme.nebulon.com:
+        server-12.tme.nebulon.com:
+      vars:
+        vcsa_name: "devvcsa.tme.nebulon.com"
+        vcsa_size: "small"
+        vcenter_ip: 10.100.24.31
+        vcsa_gw: 10.100.24.1
+        vcsa_cidr: 22
+        vcsa_dns: 10.100.72.10
+        vcsa_ntp: 10.100.72.10
+        vcsa_sso_domain: "vsphere.local"
+        vcsa_sso_password: "{{ vault_vcsa_sso_password }}"
+        vcsa_password: "{{ vault_vcsa_sso_password }}"
+        vcsa_network: "VM Network"
+    # VCSA
+    vcsa:
+      hosts:
+        devvcsa.tme.nebulon.com:
 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+None.
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+    # ===========================================================================
+    # Deploy embedded VCSA to ESXi host
+    # ===========================================================================
+    - name: Deploy a self-hosted VCSA on ESXi host
+      hosts: ['vmware[0]']
+      gather_facts: true
+      tags: play_vcsa_install
 
-    - hosts: servers
+      vars_files:
+        # Ansible vault with all required passwords
+        - "../../credentials.yml"
+
       roles:
-         - { role: username.rolename, x: 42 }
+        - { role: jedimt.vmware_vcsa_embedded_install,
+            vsphere_version: "7" }
+
+    - name: Wait for VCSA installation to complete
+      hosts: vcsa
+      gather_facts: false
+      tags: play_vcsa_install_complete
+
+      vars:
+        ansible_python_interpreter: /bin/python
+        # Use ansible_password when no SSH keys installed on the VCSA.
+        ansible_password: "{{ vault_esxi_password }}"
+
+      vars_files:
+        # Ansible vault with all required passwords
+        - "../../credentials.yml"
+
+      tasks:
+
+        - name: Check for successful VCSA deployment
+          ansible.builtin.command:
+            ls /var/log/firstboot/succeeded
+          register: vcsa_status
+          retries: 30
+          delay: 20
+          until: vcsa_status is success
+          changed_when: false
+          tags: vcsa_test
 
 License
 -------
 
-BSD
+MIT
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Aaron Patten
+aaronpatten@gmail.com

@@ -17,8 +17,9 @@ vcsa_ovf_8: "https://homes.sc0.nebulon.com/aaron/files/vmware/ovf_8.0.0.10200/vc
 deployment_script_path: "/altbootbank/nebulon/deploy_vcsa.sh"
 
 # VCSA deployment variables for the script template files
-# vcsa_name can be specified here, but I define it in inventory so I don't have to change
+# The VCSA specifics can be specified here, but I define it in inventory so I don't have to change
 # role values when I change deployment targets.
+
 # vcsa_name: ""
 # vcsa_size: "small"
 # vcenter_ip: 10.100.24.31
@@ -30,8 +31,9 @@ deployment_script_path: "/altbootbank/nebulon/deploy_vcsa.sh"
 # vcsa_sso_password: "{{ vault_vcsa_sso_password }}"
 # vcsa_password: "{{ vault_vcsa_sso_password }}"
 # vcsa_network: "VM Network"
+
 # Set vcsa_datastore to "placeholder" and then dynamically replace that with
-# a discoverd VMFS-6 datastore using the 'lineinfile' Ansible function
+# a discoverd VMFS-6 datastore using the 'lineinfile' Ansible function during deployment
 vcsa_datastore: "placeholder"
 vcsa_stage1andstage2: True
 
